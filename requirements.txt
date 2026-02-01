@@ -1,0 +1,17 @@
+# UI and Interaction
+gradio>=4.0.0
+
+# Data Processing & NLP
+pandas
+numpy
+spacy
+scikit-learn
+
+# Ontology & Graph Visualization
+networkx
+matplotlib
+pillow
+
+# Optional: Document Parsing
+python-docx
+PyPDF2
