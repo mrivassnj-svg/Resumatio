@@ -38,3 +38,48 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
 
 if __name__ == "__main__":
     demo.launch()
+import gradio as gr
+from core.visualizer import generate_ontology_graph
+from core.engine import SystemResolutionEngine
+
+# Load Engine
+engine = SystemResolutionEngine()
+
+def process_and_visualize(resume_text, job_desc):
+    # 1. Resolve Gaps (From previous step)
+    # Note: In a real app, you'd parse resume_text into a dict first
+    mock_data = {
+        "identity": {"name": "Candidate"},
+        "experience": [{"organization": "TechCorp", "technologies": ["Python", "Gradio", "NLP"]}]
+    }
+    
+    results = engine.resolve_system_gaps(mock_data, job_desc)
+    graph_img = generate_ontology_graph(mock_data)
+    
+    return (
+        results["resolution_score"],
+        ", ".join(results["critical_gaps"]),
+        graph_img
+    )
+
+# UI Layout
+with gr.Blocks() as demo:
+    gr.Markdown("## 🌐 R3sum3OS: Ontology Visualization & Resolution")
+    
+    with gr.Tab("Resolution Engine"):
+        with gr.Row():
+            with gr.Column():
+                res_in = gr.Textbox(label="Resume Raw Text")
+                jd_in = gr.Textbox(label="Job Description")
+                btn = gr.Button("Analyze System")
+            
+            with gr.Column():
+                score_out = gr.Label(label="Match Quality")
+                gap_out = gr.Textbox(label="Missing Nodes")
+    
+    with gr.Tab("System Map (Graph)"):
+        map_out = gr.Image(label="Ontology Knowledge Graph")
+
+    btn.click(process_and_visualize, inputs=[res_in, jd_in], outputs=[score_out, gap_out, map_out])
+
+demo.launch()
